@@ -23,15 +23,20 @@ def on_key_event(event):
 # Registrar las teclas de dirección
 keyboard.on_press(on_key_event)
 
-MAP_ROWS = 6
-MAP_COLS = 12
+MAP_ROWS = 10
+MAP_COLS = 10
 
 MAX_FOOD = 1
-SLEEP = 0.3
+SLEEP = 0.25
 
-STR_EMPTY = Clrs.warn(Clrs.bckg(" "))
-STR_FOOD = Clrs.warn(Clrs.bckg("•"))
-STR_SNAKE = Clrs.green(Clrs.bckg("◯"))
+#STR_EMPTY = Clrs.warn(Clrs.bckg(" "))
+#STR_FOOD = Clrs.warn(Clrs.bckg("•"))
+#STR_SNAKE = Clrs.green(Clrs.bckg("◯"))
+
+STR_EMPTY = Clrs.warn(Clrs.bckg("  "))
+STR_FOOD = Clrs.warn(Clrs.bckg("🬇🬃"))
+STR_SNAKE = Clrs.green(Clrs.bckg("🬇🬃"))
+
 
 STR_WINNER = Clrs.blue(Clrs.bckg("GAME OVER. YOU WIN"))
 STR_LOOSER = Clrs.fail(Clrs.bckg("GAME OVER. YOU LOOSE"))
