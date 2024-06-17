@@ -3,32 +3,35 @@ from time import sleep
 import keyboard
 from random import randint
 
+#Tengo el next position para los casos en los que se cambia de dirección. Para no perder. Ej
+# va a izq, y se pulsa der o (abj y der, rápido (antes de que pase el SLEEP)). Eso no movería la serpiente
+_next_snake_dir = "up"
 _snake_dir = "up"
 
 def on_key_event(event):
 	#print(event.name)
-	global _snake_dir
-	if event.name == 'flecha arriba' and _snake_dir != "down":
-		_snake_dir = "up"
-	elif event.name == 'flecha abajo' and _snake_dir != "up":
-		_snake_dir = "down"
-	elif event.name == 'flecha izquierda' and _snake_dir != "right":
-		_snake_dir = "left"
-	elif event.name == 'flecha derecha' and _snake_dir != "left":
-		_snake_dir = "right"
+	global _next_snake_dir
+	if event.name in ['flecha arriba', 'up']:
+		_next_snake_dir = "up"
+	elif event.name in ['flecha abajo', 'down']:
+		_next_snake_dir = "down"
+	elif event.name in ['flecha izquierda', 'left']:
+		_next_snake_dir = "left"
+	elif event.name in ['flecha derecha', 'right']:
+		_next_snake_dir = "right"
 
 # Registrar las teclas de dirección
 keyboard.on_press(on_key_event)
 
-MAP_ROWS = 5
-MAP_COLS = 10
+MAP_ROWS = 6
+MAP_COLS = 12
 
 MAX_FOOD = 1
 SLEEP = 0.3
 
 STR_EMPTY = Clrs.warn(Clrs.bckg(" "))
 STR_FOOD = Clrs.warn(Clrs.bckg("•"))
-STR_SNAKE = Clrs.green(Clrs.bckg("o"))
+STR_SNAKE = Clrs.green(Clrs.bckg("◯"))
 
 STR_WINNER = Clrs.blue(Clrs.bckg("GAME OVER. YOU WIN"))
 STR_LOOSER = Clrs.fail(Clrs.bckg("GAME OVER. YOU LOOSE"))
@@ -57,7 +60,9 @@ def printMap():
 		print(''.join(row))
 
 # FUNCION TERMINADA
-def moveSnake(_snake_dir):
+def moveSnake():
+	global _next_snake_dir
+	global _snake_dir
 	global _snake
 	# Guardo la posición de la cabeza para poder moverla después
 	_head = {"x":_snake[0]["x"], "y":_snake[0]["y"]}
@@ -68,6 +73,15 @@ def moveSnake(_snake_dir):
 		_snake[i]["y"] = (_snake[i-1]["y"])%MAP_ROWS
 
 	#Movimiendo la cabeza en la nueva dirección
+	if _snake_dir == "up" and _next_snake_dir != "down":
+		_snake_dir = _next_snake_dir
+	elif _snake_dir == "down" and _next_snake_dir != "up":
+		_snake_dir = _next_snake_dir
+	elif _snake_dir == "left" and _next_snake_dir != "right":
+		_snake_dir = _next_snake_dir
+	elif _snake_dir == "right" and _next_snake_dir != "left":
+		_snake_dir = _next_snake_dir
+
 	if _snake_dir == "up":
 		_snake[0]["y"] = (_head["y"]-1)%MAP_ROWS
 	elif  _snake_dir == "down":
@@ -81,6 +95,7 @@ def moveSnake(_snake_dir):
 	for seg in _snake[1:]:
 		if seg["x"] == _snake[0]["x"] and seg["y"] == _snake[0]["y"]:
 			return False
+
 	return True
 
 # return 0, si la comida no está en la serpiente
@@ -118,7 +133,6 @@ def newFood():
 			# elimino la comida
 			_map[food_pos["y"]][food_pos["x"]]["food"] = False
 			food_poss.pop(f)
-
 			#añado uno a la serpiente
 			_snake.append({"x":_snake[-1]["x"],"y":_snake[-1]["y"]})
 			break
@@ -127,7 +141,6 @@ def newFood():
 	while len(food_poss) < MAX_FOOD:
 		#nueva posicion de la comida
 		food_pos = {"x":randint(0,MAP_COLS-1), "y":randint(0,MAP_ROWS-1)}
-		
 		#si la comida la he puesto donde está la serpiente o si la he puesto donde ya había comida vuelvo a intentarlo
 		while checkIfFoodInSnake(food_poss+[food_pos]) != 0 or checkIfFoodPreviouslyPlace(food_pos, food_poss):
 			food_pos = {"x":randint(0,MAP_COLS-1), "y":randint(0,MAP_ROWS-1)}
@@ -152,14 +165,13 @@ def main():
 		sleep(SLEEP)
 
 		#Despues de esperar muevo la serpiente y compruebo que no me haya comido a mi mismo
-		if moveSnake(_snake_dir) == False:
-			break;
+		if moveSnake() == False:
+			break
 
 	if len(_snake) == MAP_COLS*MAP_ROWS:
 		print(STR_WINNER)
 	else:
 		print(STR_LOOSER)
-
 
 if __name__ == '__main__':
 	main()
